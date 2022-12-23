@@ -51,7 +51,7 @@ async function gh_release(xpi_file, updates_file) {
   const authData = await ghauth(ghauthOpts)
   const options = {
     auth: authData,
-    dryRun: true,
+    dryRun: false,
     assets: assets
   }
   return ghRelease(options, function (err, result) {
