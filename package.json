@@ -1,0 +1,31 @@
+{
+  "name": "tb-bug-porter",
+  "description": "Quickly create 'port bugs' for upstream changes affecting Thunderbird development",
+  "license": "MPL2",
+  "author": "JFX",
+  "private": true,
+  "version": "0.1.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jfx2006/bugzporter"
+  },
+  "scripts": {
+    "build": "web-ext build",
+    "dev": "web-ext run --verbose",
+    "lint": "eslint .",
+    "release": "node scripts/release.mjs"
+  },
+  "devDependencies": {
+    "eslint": "^8.30.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-html": "^7.1.0",
+    "eslint-plugin-no-unsanitized": "^4.0.2",
+    "eslint-plugin-prettier": "^4.2.1",
+    "gh-release": "^7.0.0",
+    "ghauth": "^5.0.1",
+    "node-fetch": "^3.3.0",
+    "prettier": "^2.8.1",
+    "web-ext": "^7.4.0"
+  },
+  "dependencies": {}
+}

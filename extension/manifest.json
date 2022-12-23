@@ -1,0 +1,23 @@
+{
+  "name": "tb-bugzporter",
+  "description": "Quickly create 'port bugs' for upstream changes affecting Thunderbird development",
+  "manifest_version": 2,
+  "version": "0.1.0",
+  "homepage_url": "https://github.com/jfx2006/bugzporter",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "tb_bug_porter@xul.calypsoblue.org",
+      "strict_min_version": "102.0",
+      "update_url": "https://github.com/jfx2006/bugzporter/releases/latest/download/updates.json"
+    }
+  },
+  "icons": {
+    "48": "icons/bugz.png"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://bugzilla.mozilla.org/show_bug.cgi?*"],
+      "js": ["lib/bugzporter.mjs"]
+    }
+  ]
+}
