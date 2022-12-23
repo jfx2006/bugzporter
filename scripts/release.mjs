@@ -17,6 +17,7 @@ import getValidatedManifest from "../node_modules/web-ext/lib/util/manifest.js"
 
 const XPI_URL = "https://github.com/jfx2006/bugzporter/releases/download"
 
+const AMO_CRED = `${process.cwd()}/amo.json`
 
 function checksum_file(path) {
   const fileBuffer = fs.readFileSync(path)
@@ -60,22 +61,53 @@ async function gh_release(xpi_file, updates_file) {
   })
 }
 
+function getAMOCred() {
+  try {
+    const fileBuffer = fs.readFileSync(AMO_CRED, {encoding: "utf-8"})
+    return JSON.parse(fileBuffer)
+  } catch(e) {
+    console.error("AMO credentials file not found or unreadable.")
+  }
+}
+
 ;(async () => {
   const sourceDir = `${process.cwd()}/extension`
   const artifactsDir = `${process.cwd()}/web-ext-artifacts`
 
-  const build_result = await webExt.cmd.build(
-    {
-      sourceDir: sourceDir,
-      artifactsDir: artifactsDir,
-      overwriteDest: true,
-      filename: "{name}-{version}.xpi",
-    },
-    {
-      shouldExitProgram: false,
-    }
-  )
-  const xpi_file = build_result["extensionPath"]
+  const amoAuth = getAMOCred()
+
+  let xpi_file
+  if (!amoAuth) {
+    const build_result = await webExt.cmd.build(
+      {
+        sourceDir: sourceDir,
+        artifactsDir: artifactsDir,
+        overwriteDest: true,
+        filename: "{name}-{version}.xpi",
+        verbose: true
+      },
+      {
+        shouldExitProgram: false
+      }
+    )
+    xpi_file = build_result["extensionPath"]
+  } else {
+    const sign_result = await webExt.cmd.sign(
+      {
+        sourceDir: sourceDir,
+        artifactsDir: artifactsDir,
+        apiKey: amoAuth.apiKey,
+        apiSecret: amoAuth.apiSecret,
+        verbose: true,
+        channel: "unlisted"
+      },
+      {
+        shouldExitProgram: false
+      }
+    )
+    xpi_file = sign_result["downloadedFiles"][0]
+  }
+
   const manifest = await getValidatedManifest(sourceDir)
   const checksum = checksum_file(xpi_file)
 
