@@ -9,6 +9,9 @@
   }
   window.hasRun = true
 
+  const PORT_BZ_PRODUCT = "Thunderbird"
+  const PORT_BZ_COMPONENT = "Upstream Synchronization"
+
   function isLoggedIn() {
     const e = document.getElementById("header-account")
     return e !== null
@@ -19,8 +22,10 @@
       "#field-value-bug_type > .bug-type-label"
     ).dataset["type"]
     let url = new URL(
-      "https://bugzilla.mozilla.org/enter_bug.cgi?format=__default__&product=Thunderbird&component=Upstream%20Synchronization"
+      "https://bugzilla.mozilla.org/enter_bug.cgi?format=__default__"
     )
+    url.searchParams.append("product", PORT_BZ_PRODUCT)
+    url.searchParams.append("component", PORT_BZ_COMPONENT)
     url.searchParams.append("see_also", this_bug)
     url.searchParams.append(
       "short_desc",
@@ -30,19 +35,32 @@
     return url
   }
 
-  if (isLoggedIn()) {
-    const portBtn = `<button type="button" id="port-btn" class="primary">
+  function makeButton() {
+    /* <button type="button" id="port-btn" class="primary">
         <span id="mode-btn-readonly" title="Port Bug to Thunderbird">Port Bug</span>
-      </button`
-
-    const pageToolbar = document.querySelector("#page-toolbar > div.buttons")
-    pageToolbar.insertAdjacentHTML("beforeend", portBtn)
-    const portBtnElem = document.getElementById("port-btn")
+      </button> */
+    const portBtnElem = document.createElement("button")
+    portBtnElem.type = "button"
+    portBtnElem.id = "port-btn"
+    portBtnElem.classList.add("primary")
+    const portSpan = document.createElement("span")
+    portSpan.id = "port-btn-readonly"
+    portSpan.title = "Port Bug to Thunderbird"
+    portSpan.innerText = "Port Bug"
+    portBtnElem.appendChild(portSpan)
 
     portBtnElem.onclick = function () {
       const BUGZILLA = window.wrappedJSObject.BUGZILLA
       const url = makePortURL(BUGZILLA.bug_id, BUGZILLA.bug_summary)
       open(url.href)
     }
+
+    return portBtnElem
+  }
+
+  if (isLoggedIn()) {
+    const portBtnElem = makeButton()
+    const pageToolbar = document.querySelector("#page-toolbar > div.buttons")
+    pageToolbar.insertAdjacentElement("beforeend", portBtnElem)
   }
 })()
