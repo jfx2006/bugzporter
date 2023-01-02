@@ -14,6 +14,7 @@ import ghRelease from "gh-release"
 
 import webExt from "web-ext"
 import getValidatedManifest from "../node_modules/web-ext/lib/util/manifest.js"
+import SubmitClient, {JwtApiAuth as ApiAuthClass} from "../node_modules/web-ext/lib/util/submit-addon.js"
 
 const XPI_URL = "https://github.com/jfx2006/bugzporter/releases/download"
 
@@ -29,8 +30,12 @@ function checksum_file(path) {
 
 async function get_update_data(update_url, manifest_id) {
   const response = await fetch(update_url)
-  if (response.size > 0) {
-    return await response.json()
+  if (response.status < 200 || response.status >= 500) {
+    throw new Error(`Bad Request: ${response.statusText || response.status}.`);
+  }
+  const data = await response.json();
+  if (response.ok) {
+    return data
   }
   let result = {"addons": {}}
   result.addons[manifest_id] = {updates: []}
@@ -70,10 +75,7 @@ function getAMOCred() {
   }
 }
 
-;(async () => {
-  const sourceDir = `${process.cwd()}/extension`
-  const artifactsDir = `${process.cwd()}/web-ext-artifacts`
-
+async function build_or_sign(sourceDir, artifactsDir) {
   const amoAuth = getAMOCred()
 
   let xpi_file
@@ -96,6 +98,8 @@ function getAMOCred() {
       {
         sourceDir: sourceDir,
         artifactsDir: artifactsDir,
+        overwriteDest: true,
+        filename: "{name}-{version}.xpi",
         apiKey: amoAuth.apiKey,
         apiSecret: amoAuth.apiSecret,
         verbose: true,
@@ -107,9 +111,53 @@ function getAMOCred() {
     )
     xpi_file = sign_result["downloadedFiles"][0]
   }
+  return xpi_file
+}
 
+async function check_signed(sourceDir, artifactsDir) {
   const manifest = await getValidatedManifest(sourceDir)
-  const checksum = checksum_file(xpi_file)
+  const addonId = manifest.browser_specific_settings.gecko.id
+  const amoAuth = getAMOCred()
+  let baseUrl = new URL("https://addons.mozilla.org/api/v5/")
+
+  const client = new SubmitClient({
+    apiAuth: new ApiAuthClass({
+      apiKey: amoAuth.apiKey,
+      apiSecret: amoAuth.apiSecret
+    }),
+    baseUrl,
+    downloadDir: artifactsDir
+  });
+
+  const url = new URL(`addon/${addonId}/versions/?filter=all_with_unlisted`, client.apiUrl);
+  const {
+    results: [{
+      id: newVersionId
+    }]
+  } = await client.fetchJson(url);
+  const fileUrl = new URL(await client.waitForApproval(addonId, newVersionId));
+  const result = await client.downloadSignedFile(fileUrl, addonId);
+  return result["downloadedFiles"][0]
+}
+
+;(async () => {
+  const sourceDir = `${process.cwd()}/extension`
+  const artifactsDir = `${process.cwd()}/web-ext-artifacts`
+
+  let xpi_file
+
+  const argv = process.argv.slice(2);
+  if (argv[0] === "check") {
+    xpi_file = await check_signed(sourceDir, artifactsDir)
+  } else {
+    xpi_file = await build_or_sign(sourceDir, artifactsDir)
+  }
+
+  if (!xpi_file) {
+    throw new Error("xpi_file invalid after build/check/sign.")
+  }
+  const manifest = await getValidatedManifest(sourceDir)
+  const checksum = checksum_file(`${artifactsDir}/${xpi_file}`)
 
   const update_link = `${XPI_URL}/${manifest.version}/${path.basename(
     xpi_file
@@ -135,5 +183,5 @@ function getAMOCred() {
   const updates_file = `${artifactsDir}/updates.json`
   fs.writeFileSync(updates_file, JSON.stringify(update_data))
 
-  await gh_release(xpi_file, updates_file)
+  await gh_release(`${artifactsDir}/${xpi_file}`, updates_file)
 })()
