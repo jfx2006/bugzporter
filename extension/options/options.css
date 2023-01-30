@@ -1,0 +1,59 @@
+/* CSS Rules lifted from toolkit/themes/shared/in-content/common-shared.css */
+
+:root {
+    color-scheme: light dark;
+    --in-content-primary-button-background: #0061e0;
+    --in-content-primary-button-text-color: rgb(251,251,254);
+    --in-content-focus-outline-color: var(--in-content-primary-button-background);
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --in-content-primary-button-text-color: rgb(43,42,51);
+        --in-content-primary-button-background: rgb(0,221,255);}
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    overflow: hidden;
+}
+
+label {
+    display: flex;
+    align-items: center;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    padding-block-end: 1rem;
+}
+
+button {
+    margin-inline: 0 auto;
+    background-color: var(--in-content-primary-button-background);
+    color: var(--in-content-primary-button-text-color);
+    border-color: transparent;
+    border-radius: 4px;
+    font-weight: 600;
+    padding: 7px 15px;
+    margin-top: 8px;
+    margin-left: 4px;
+    min-width: 73px;
+}
+
+input[type='text'] {
+    margin: 2px 4px;
+    padding: 8px;
+    border-radius: 4px;
+}
+
+input[type='text']:focus {
+    border-color: transparent;
+    outline: 2px solid var(--in-content-focus-outline-color);
+    outline-offset: -1px;
+}
+
+img {
+    margin-top: 12px;
+}

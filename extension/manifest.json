@@ -18,6 +18,30 @@
     {
       "matches": ["https://bugzilla.mozilla.org/show_bug.cgi?*"],
       "js": ["lib/bugzporter.mjs"]
+    },
+    {
+      "matches": [
+        "https://bugzilla.mozilla.org/page.cgi?id=mydashboard.html"
+      ],
+      "js": [
+        "lib/pb-content-script.js"
+      ],
+      "css": [
+        "lib/pb-content-script.css"
+      ],
+      "run_at": "document_idle"
     }
-  ]
+  ],
+  "background": {
+    "scripts": [
+      "lib/phab-bugzilla.js"
+    ]
+  },
+  "permissions": [
+    "storage",
+    "https://phabricator.services.mozilla.com/*"
+  ],
+  "options_ui": {
+    "page": "options/options.html"
+  }
 }
