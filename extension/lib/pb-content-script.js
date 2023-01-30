@@ -25,6 +25,8 @@ function timeDifference(current, previous) {
   }
 }
 
+let hasApiToken = false
+
 function createElement(tag, props = {}, text = "") {
   const isSubset = (haystack, needles) =>
     needles.every((needle) => haystack.includes(needle))
@@ -231,12 +233,39 @@ function mk_revision_search_func(user_id, constraints) {
   return revision_search
 }
 
+function reloadMe(changes, area) {
+  if (area !== "local") {
+    return
+  }
+  const changedItems = Object.keys(changes)
+  for (const item of changedItems) {
+    if (item === "apiToken") {
+      console.log(`${item} has changed`)
+      setTimeout(function () {
+        // eslint-disable-next-line no-unused-vars
+        let promise = run()
+      }, 1000)
+    }
+  }
+}
+
 async function run() {
+  browser.storage.onChanged.addListener(reloadMe)
+
   const profile = document.querySelector(
     "#header-account a[href^='/user_profile?user_id=']"
   )
   if (!profile) {
     error('Could not find "My Profile" link on page')
+    return
+  }
+
+  const user_id = new URL(profile.href).searchParams.get("user_id")
+  hasApiToken = await browser.runtime.sendMessage({
+    msg: "check.apikey",
+    user_id: user_id,
+  })
+  if (!hasApiToken) {
     return
   }
 
@@ -246,8 +275,6 @@ async function run() {
   if (remove_heading) {
     remove_heading.remove()
   }
-
-  const user_id = new URL(profile.href).searchParams.get("user_id")
 
   const assigned_data_func = mk_revision_search_func(
     user_id,

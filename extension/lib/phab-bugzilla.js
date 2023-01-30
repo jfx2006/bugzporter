@@ -41,6 +41,17 @@ async function getPhid(user_id, apiToken) {
   return phid
 }
 
+async function checkApiToken(user_id) {
+  const bmo_key = `bmo.${user_id}`
+  // eslint-disable-next-line no-unused-vars
+  let { apiToken, [bmo_key]: phid } = await browser.storage.local.get([
+    "apiToken",
+    bmo_key,
+  ])
+
+  return Boolean(apiToken)
+}
+
 async function revisionSearch(user_id, constraints) {
   const bmo_key = `bmo.${user_id}`
   let { apiToken, [bmo_key]: phid } = await browser.storage.local.get([
@@ -68,6 +79,9 @@ async function revisionSearch(user_id, constraints) {
 
 function init() {
   browser.runtime.onMessage.addListener(async (data, sender) => {
+    if (data.msg === "check.apikey") {
+      return await checkApiToken(data.user_id)
+    }
     if (data.msg === "revision.search") {
       return await revisionSearch(data.user_id, data.constraints)
     }
