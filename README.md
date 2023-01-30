@@ -25,6 +25,14 @@ Currently, these fields are set:
 - Bug Type: Set to the bug type of the original
 - See Also: Set to original bug number
 
+## Phabricator In Bugzilla
+
+Displays Review requests from Phabricator in Bugzilla Dashboard. A Phabricator
+API key needs to be set in Options for this to work.
+
+![PhabInBugzilla](images/phab-in-bugzilla.png)
+
+
 ## Install
 
 
