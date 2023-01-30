@@ -157,7 +157,10 @@ async function check_signed(sourceDir, artifactsDir) {
     throw new Error("xpi_file invalid after build/check/sign.")
   }
   const manifest = await getValidatedManifest(sourceDir)
-  const checksum = checksum_file(`${artifactsDir}/${xpi_file}`)
+  if (!xpi_file.startsWith(artifactsDir)) {
+    xpi_file = `${artifactsDir}/${xpi_file}`
+  }
+  const checksum = checksum_file(xpi_file)
 
   const update_link = `${XPI_URL}/${manifest.version}/${path.basename(
     xpi_file
@@ -183,5 +186,5 @@ async function check_signed(sourceDir, artifactsDir) {
   const updates_file = `${artifactsDir}/updates.json`
   fs.writeFileSync(updates_file, JSON.stringify(update_data))
 
-  await gh_release(`${artifactsDir}/${xpi_file}`, updates_file)
+  await gh_release(`${xpi_file}`, updates_file)
 })()
