@@ -5,6 +5,7 @@
     --in-content-primary-button-background: #0061e0;
     --in-content-primary-button-text-color: rgb(251,251,254);
     --in-content-focus-outline-color: var(--in-content-primary-button-background);
+    --in-content-saved: #00d084;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -40,6 +41,10 @@ button {
     margin-top: 8px;
     margin-left: 4px;
     min-width: 73px;
+}
+
+button.saved {
+    background-color: var(--in-content-saved);
 }
 
 input[type='text'] {
