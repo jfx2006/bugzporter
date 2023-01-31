@@ -162,7 +162,7 @@ async function check_signed(sourceDir, artifactsDir) {
   }
   const checksum = checksum_file(xpi_file)
 
-  const update_link = `${XPI_URL}/${manifest.version}/${path.basename(
+  const update_link = `${XPI_URL}/v${manifest.version}/${path.basename(
     xpi_file
   )}`
 
