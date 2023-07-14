@@ -21,6 +21,9 @@
     const bug_type = document.querySelector(
       "#field-value-bug_type > .bug-type-label"
     ).dataset["type"]
+    const target_milestone = document.getElementById(
+      "field-value-target_milestone"
+    )?.textContent?.trim().split(" ")?.[0]
     let url = new URL(
       "https://bugzilla.mozilla.org/enter_bug.cgi?format=__default__"
     )
@@ -32,6 +35,9 @@
       `Port bug ${this_bug}: ${this_summary}`
     )
     url.searchParams.append("bug_type", bug_type)
+    if (target_milestone) {
+      url.searchParams.append("version", `Thunderbird ${target_milestone}`);
+    }
     return url
   }
 
