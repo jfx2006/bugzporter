@@ -4,7 +4,7 @@
   "license": "MPL2",
   "author": "JFX",
   "private": true,
-  "version": "0.2.0",
+  "version": "0.3.1",
   "repository": {
     "type": "git",
     "url": "https://github.com/jfx2006/bugzporter"
