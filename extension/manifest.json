@@ -2,7 +2,7 @@
   "name": "tb-bugzporter",
   "description": "Quickly create 'port bugs' for upstream changes affecting Thunderbird development",
   "manifest_version": 2,
-  "version": "0.3.1",
+  "version": "0.3.2",
   "homepage_url": "https://github.com/jfx2006/bugzporter",
   "browser_specific_settings": {
     "gecko": {
