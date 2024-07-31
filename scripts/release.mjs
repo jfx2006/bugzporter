@@ -15,6 +15,7 @@ import ghRelease from "gh-release"
 import webExt from "web-ext"
 import getValidatedManifest from "../node_modules/web-ext/lib/util/manifest.js"
 import SubmitClient, {JwtApiAuth as ApiAuthClass} from "../node_modules/web-ext/lib/util/submit-addon.js"
+import { AMO_BASE_URL } from "../node_modules/web-ext/lib/program.js"
 
 const XPI_URL = "https://github.com/jfx2006/bugzporter/releases/download"
 
@@ -96,14 +97,16 @@ async function build_or_sign(sourceDir, artifactsDir) {
   } else {
     const sign_result = await webExt.cmd.sign(
       {
-        sourceDir: sourceDir,
-        artifactsDir: artifactsDir,
-        overwriteDest: true,
-        filename: "{name}-{version}.xpi",
+        amoBaseUrl: AMO_BASE_URL,
         apiKey: amoAuth.apiKey,
         apiSecret: amoAuth.apiSecret,
+        artifactsDir: artifactsDir,
+        sourceDir: sourceDir,
+        channel: "unlisted",
+        overwriteDest: true,
+        filename: "{name}-{version}.xpi",
+
         verbose: true,
-        channel: "unlisted"
       },
       {
         shouldExitProgram: false
