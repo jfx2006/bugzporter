@@ -74,46 +74,30 @@ function mk_table(table_title, id, data_func) {
   const h2 = createElement("h2", { class: "query_heading" }, table_title)
   div_elems.push(h2)
 
-  const content = createElement("div", { class: "yui3-datatable-content" })
+  const content = createElement("div", { class: "data-table-container" })
   div_elems.push(content)
 
   const span = createElement("span")
   const a_refresh = createElement(
     "a",
     { class: "refresh", href: "javascript:void(0);" },
-    "Refresh"
+    "Refresh",
   )
   span.append(a_refresh)
   content.append(span)
 
-  const table = createElement("table", { class: "yui3-datatable-table" })
+  const table = createElement("table", { class: "data-table" })
   content.append(table)
 
-  const thead = createElement("thead", { class: "yui3-datatable-columns" })
+  const thead = createElement("thead")
 
   {
     const tr = createElement("tr")
 
-    const revision = createElement(
-      "th",
-      { class: "yui3-datatable-header" },
-      "Revision"
-    )
-    const updated = createElement(
-      "th",
-      { class: "yui3-datatable-header" },
-      "Updated"
-    )
-    const status = createElement(
-      "th",
-      { class: "yui3-datatable-header" },
-      "Status"
-    )
-    const title = createElement(
-      "th",
-      { class: "yui3-datatable-header" },
-      "Title"
-    )
+    const revision = createElement("th", {}, "Revision")
+    const updated = createElement("th", {}, "Updated")
+    const status = createElement("th", {}, "Status")
+    const title = createElement("th", {}, "Title")
 
     tr.append(revision)
     tr.append(updated)
@@ -125,7 +109,7 @@ function mk_table(table_title, id, data_func) {
 
   table.append(thead)
 
-  const tbody = createElement("tbody", { class: "yui3-datatable-data" })
+  const tbody = createElement("tbody")
   table.append(tbody)
 
   a_refresh.addEventListener("click", function (e) {
@@ -151,39 +135,34 @@ function fill_data(tbody, data) {
 
   let table_rows = []
   for (let rev of data) {
-    const tr = createElement("tr", { class: "yui3-datatable-data" })
+    const tr = createElement("tr")
 
-    const revision = createElement("td", { class: "yui3-datatable-cell" })
+    const revision = createElement("td")
     const a = createElement(
       "a",
       {
         href: `https://phabricator.services.mozilla.com/D${rev.id}`,
         target: "_blank",
       },
-      `D${rev.id}`
+      `D${rev.id}`,
     )
     revision.append(a)
 
     const updated = createElement(
       "td",
       {
-        class: "yui3-datatable-cell",
         title: new Date(rev.fields.dateModified * 1000).toString(),
       },
-      timeDifference(Date.now(), rev.fields.dateModified * 1000)
+      timeDifference(Date.now(), rev.fields.dateModified * 1000),
     )
 
-    const status = createElement(
-      "td",
-      { class: "yui3-datatable-cell" },
-      rev.fields.status.name
-    )
-    const title = createElement("td", { class: "yui3-datatable-cell" })
+    const status = createElement("td", {}, rev.fields.status.name)
+    const title = createElement("td")
 
     // Linkify "Bug XXX - "
     const match =
       /^(?<before>.*)?(?<title>[Bb]ug (?<id>\d+))(?<after>.*)?/.exec(
-        rev.fields.title
+        rev.fields.title,
       )
     if (match) {
       if (match.groups.before) {
@@ -253,7 +232,7 @@ async function run() {
   browser.storage.onChanged.addListener(reloadMe)
 
   const profile = document.querySelector(
-    "#header-account a[href^='/user_profile?user_id=']"
+    "#header-account a[href^='/user_profile?user_id=']",
   )
   if (!profile) {
     error('Could not find "My Profile" link on page')
@@ -270,7 +249,7 @@ async function run() {
   }
 
   let remove_heading = document.querySelector(
-    "#right > h2.query_heading.requests"
+    "#right > h2.query_heading.requests",
   )
   if (remove_heading) {
     remove_heading.remove()
@@ -278,23 +257,23 @@ async function run() {
 
   const assigned_data_func = mk_revision_search_func(
     user_id,
-    "constraints[authorPHIDs][0]"
+    "constraints[authorPHIDs][0]",
   )
   const assigned_div = mk_table(
     "Phabricator: Your revisions",
     "phab_assigned",
-    assigned_data_func
+    assigned_data_func,
   )
   document.querySelector("#left").append(assigned_div)
 
   const reviewing_data_func = mk_revision_search_func(
     user_id,
-    "constraints[reviewerPHIDs][0]"
+    "constraints[reviewerPHIDs][0]",
   )
   const reviewing_div = mk_table(
     "Phabricator: Review Requests",
     "phab_reviewing",
-    reviewing_data_func
+    reviewing_data_func,
   )
   document.querySelector("#right").append(reviewing_div)
 }
